@@ -216,7 +216,8 @@ public class TabPageIndicator extends HorizontalScrollView implements ViewPager.
         int width = tabView.getWidth();
         float offset = width * mOffset;
         int left = tabView.getLeft();
-        int scrollWitch= (int) (left-measuredWidth/2 + offset);
+        //int scrollWitch= (int) (left-measuredWidth/2 + offset);
+        int scrollWitch= (int) (left-measuredWidth/2 + offset+width/2); // 可以保证完全在中间
         smoothScrollTo(scrollWitch,0);
 
 
