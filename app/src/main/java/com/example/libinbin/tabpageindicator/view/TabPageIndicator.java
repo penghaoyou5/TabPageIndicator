@@ -18,7 +18,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
-
 public class TabPageIndicator extends HorizontalScrollView implements ViewPager.OnPageChangeListener {
 
     /**
@@ -31,7 +30,7 @@ public class TabPageIndicator extends HorizontalScrollView implements ViewPager.
     private int mSelectTextColor=Color.RED;
     private int mTextSize=10;
 
-    private int mCurrentPosition;
+    private int mCurrentPosition  = -1;
     private int mSelectPosition;
 
 
@@ -42,6 +41,12 @@ public class TabPageIndicator extends HorizontalScrollView implements ViewPager.
     private Paint mSelectLinePaint;
     private int mLineColor=Color.RED;
     private int mLineHeight=4;
+
+
+    /**
+     * 判断是否是OnClick主导发生的事件   这样不再返回来影响TabPageIndicator
+     */
+    private boolean isClick = false;
 
 
     /**
@@ -143,7 +148,16 @@ public class TabPageIndicator extends HorizontalScrollView implements ViewPager.
         tabView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                if(position!=mCurrentPosition){
+                    isClick = true;
+                    mCurrentPosition=position;
+                    scrollToChild();
+                    invalidate();
+                }
+
                 mPager.setCurrentItem(position);
+
                 updateTextSelectState(position);
             }
         });
@@ -156,6 +170,13 @@ public class TabPageIndicator extends HorizontalScrollView implements ViewPager.
         if (mListener!=null){
             mListener.onPageScrolled(position,positionOffset,positionOffsetPixels);
         }
+
+        if(position==mCurrentPosition&&mOffset==0)
+            isClick = false;
+
+        if(isClick)
+            return;
+
         mCurrentPosition=position;
         mOffset=positionOffset;
 
@@ -188,7 +209,10 @@ public class TabPageIndicator extends HorizontalScrollView implements ViewPager.
 
     private void scrollToChild() {
         int measuredWidth = this.getMeasuredWidth();
+        if(mCurrentPosition==-1)return;
+        if(mLinearLayout==null)return;
         View tabView = mLinearLayout.getChildAt(mCurrentPosition);
+        if(tabView==null)return;
         int width = tabView.getWidth();
         float offset = width * mOffset;
         int left = tabView.getLeft();
