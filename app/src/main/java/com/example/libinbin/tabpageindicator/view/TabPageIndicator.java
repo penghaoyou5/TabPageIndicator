@@ -19,6 +19,22 @@ import android.widget.OverScroller;
 import java.lang.reflect.Field;
 
 
+/**
+ * 更改tabPageIndicator到TabPageCoverFlow效果
+ *
+ * 1.平移与缩放效果 在TabPageCoverFlowLiearLayout中实现  -- 告诉我既然android自定义控件就多看看View与ViewPager实现
+ *
+ * 2.滑动停止与抬手事件最后一个完成 进行响应
+ *          通过反射获取父类私有mScroller变量,同时重写dispatch监听 重写onTouch调用方法
+ *          验证它是多次调用的 与中间哦而出现调用的 所以延时条件判断 isStop&&isUp 与  private int waiIsLast; private int neiIsLast;
+ *       两个变量进行过滤
+ *
+ * 3.当添加ViewPager随动之后两者相互影响
+ *        解决思路当viewpager产生影响的时候,只有viewpager起作用
+ *        解决办法 对ViewPager设置onTouch监听,其中设置onPageChangListener监听   监听到滑动结束后取消监听
+ *        同时 在computeScroll 中当viewPager有监听起作用时  直接返回 不判断滑动停止让tabPageIndicator起作用
+ *        同时滑动实时通过 smoothScrollTo 进行 不通过父类OverScroller进行 不然会多次调用重绘卡顿
+ */
 public class TabPageIndicator extends HorizontalScrollView implements ViewPager.OnPageChangeListener {
 
 
